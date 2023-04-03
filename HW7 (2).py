@@ -1,7 +1,7 @@
 
 # Your name: Jade Stoler
 # Your student id: 0172 8980  
-# Your email: jkstoler@umich.edu
+# Your email: jkstoler@umich.edu.
 # List who you have worked with on this project: Dylan and Lily
 
 import unittest
