@@ -53,7 +53,17 @@ def make_positions_table(data, cur, conn):
 #     created for you -- see make_positions_table above for details.
 
 def make_players_table(data, cur, conn):
-    pass
+    for player in data['squad']:
+        player_id = player['id']
+        player_name = player['name']
+        player_position = player['position']
+        player_dob = int(player['dateOfBirth'][0:4])
+        player_nationality = player['nationality']
+        cur.execute("SELECT id FROM Positions WHERE position  = ?", (player_position,))
+        player_positionid = cur.fetchone()[0]
+        cur.execute("CREATE TABLE IF NOT EXISTS Players (id INT PRIMARY KEY, name TEXT, position_id INT, birthyear INT, nationality TEXT)")
+         cur.execute("INSERT OR IGNORE INTO Players (id, name, position_id, birthyear, nationality) VALUES (?,?,?,?,?)",(player_id, player_name, player_positionid, player_dob, player_nationality))
+    conn.commit()
 
 ## [TASK 2]: 10 points
 # Finish the function nationality_search
@@ -66,7 +76,11 @@ def make_players_table(data, cur, conn):
         # the player's name, their position_id, and their nationality.
 
 def nationality_search(countries, cur, conn):
-    pass
+    player_lst = []
+    for country in countries:
+        cur.execute("SELECT name, positionid, nationality FROM Players WHERE nationality = ?", (country,))
+        player_lst += cur.fetchall()
+    return player_lst
 
 ## [TASK 3]: 10 points
 # finish the function birthyear_nationality_search
@@ -85,7 +99,9 @@ def nationality_search(countries, cur, conn):
 
 
 def birthyear_nationality_search(age, country, cur, conn):
-    pass
+    year = 2023 - age
+    cur.execute("SELECT name, nationality, birthyear FROM Players WHERE nationality = ? AND birthyear < ?", (country,year))
+    return cur.fetchall()
 
 ## [TASK 4]: 15 points
 # finish the function position_birth_search
@@ -105,8 +121,9 @@ def birthyear_nationality_search(age, country, cur, conn):
     # HINT: You'll have to use JOIN for this task.
 
 def position_birth_search(position, age, cur, conn):
-       pass
-
+     year = 2023 - age
+     cur.execute("SELECT Players.name, Positions.position, PLayers.birthyear FROM Players JOIN Positions ON Players.position_id = Positions.id  WHERE Positions.position = ? and Players.birthyear < ?", (position, year))
+     return cur.fetchall()
 
 # [EXTRA CREDIT]
 # You’ll make 3 new functions, make_winners_table(), make_seasons_table(),
